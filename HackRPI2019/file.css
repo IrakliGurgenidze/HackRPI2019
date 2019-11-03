@@ -1,0 +1,74 @@
+h1{
+	color:black;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:40px;
+	font-weight: bold;
+	margin: auto;
+	text-align: center;
+}
+
+p1{
+	color:black;
+	font-family: Arial, Helvetica, sans-serif;
+	line-height: 2em;
+	font-size:20px;
+	margin: auto;
+	text-align: center;
+
+
+}
+
+.container{
+	width: 80%;
+}
+
+p{
+	color:black;
+	font-family: Arial, Helvetica, sans-serif;
+	line-height: 2em;
+	font-size:20px;
+	margin: auto;
+	text-align: center;
+}
+
+.box-2{
+	background-color: #grey;
+	border: 10px;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+* {
+    box-sizing: border-box;  
+}
+
+.setting {
+    position: absolute;
+    bottom: 0;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+}
+
+.cog
+{
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    max-width: 65px;
+}
+img {
+    width: 100%;
+    height: auto;
+}
+body {
+    background: url('Faultline4.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
