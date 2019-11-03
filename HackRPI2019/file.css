@@ -61,6 +61,15 @@ p{
     right: 10px;
     max-width: 65px;
 }
+
+.return
+{
+	position: absolute;
+	bottom: 0;
+	left: 10px;
+	max-width: 65px
+}
+
 img {
     width: 100%;
     height: auto;
