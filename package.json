@@ -2,9 +2,9 @@
   "name": "hackrpi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "pm2 start index --watch --ignore-watch \"node_modules\""
+    "test": "nodemon -e html,js,css --ignore node_modules"
   },
   "repository": {
     "type": "git",
