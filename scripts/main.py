@@ -5,50 +5,39 @@ from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 from twilio.rest import Client
 
-def db_connect():
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
-    client.connect()
-    database_name = "test"
-    return client
-
-def db_get():
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
-    client.connect()
-    database_name = "test"
-    my_database = client[database_name]
-
-    for doc in my_database:
-        print(doc['lastLat'], doc['lastLng'])
-
-
-    client.disconnect()
-
-def db_push():
+def create_document(username,password):
     client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
 
     data = {
-        'username':'skrt@gmail.com',
-        'password': 'julia1738',
+        'username': username,
+        'password': password,
         'preferences': {
-            'data_permission': 'true',
-            'family_numbers':[{'8455210416':'Bob'},{'8455210415':'Sally'}]
+            'data_permission': 'false',
+            'family_numbers':[] #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
         },
         'coordinates': [
-            [
-                {"lat": 69},
-                {"lng": 69},
-                {"timestamp":"11/3/2019"}
-            ]
+            #[{"lat": 69},{"lng": 69},{"timestamp":"11/3/2019"}]
         ]
     }
+
+    client.disconnect()
+
+def add_coordinates(username,password,lat,lng):
+    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
+    client.connect()
+    database_name = "test"
+    my_database = client[database_name]
+
+    data = check_login(username,password)
+
     data['coordinates'].append([
-                {"lat": 69},
-                {"lng": 69},
+                {"lat": lat},
+                {"lng": lng},
                 {"timestamp":"11/4/2019"}
-        ])
+    ])
 
     my_database.create_document(data)
     print('Date pushed to database')
@@ -64,12 +53,12 @@ def check_login(username, password):
         username_db = d["username"]
         password_db = d["password"]
         if username == username_db and password == password_db:
-            return True
-
+            return d
+    print('Could not find account')
     client.disconnect()
-    return False
 
-def send_text():
+
+def send_text(lat,lng):
     # Your Account SID from twilio.com/console
     account_sid = "AC08edac3cdeeed8e8341e114d675949f6"
     # Your Auth Token from twilio.com/console
@@ -80,7 +69,7 @@ def send_text():
     message = client.messages.create(
         to="+18455210416", 
         from_="+19387770709",
-        body="www.google.com/maps/place/42.72128+-73.6886784")
+        body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
 
 
@@ -112,8 +101,7 @@ def main():
         print ("Received an error from server, cannot retrieve results " + str(webUrl.getcode()))
 
 if __name__ == "__main__":
-    #main()
+    main()
     #db_get()
     #send_text()
-    db_push()
-    check_login("skrt@gmail.com","julia1738")
+    #check_login("skrt@gmail.com","julia1738")
