@@ -1,5 +1,8 @@
 import urllib.request
+import requests
 import json
+import uncurl
+import time
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
@@ -33,10 +36,12 @@ def add_coordinates(username,password,lat,lng):
 
     data = check_login(username,password)
 
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
     data['coordinates'].append([
                 {"lat": lat},
                 {"lng": lng},
-                {"timestamp":"11/4/2019"}
+                {"timestamp":current_time}
     ])
 
     my_database.create_document(data)
@@ -53,12 +58,13 @@ def check_login(username, password):
         username_db = d["username"]
         password_db = d["password"]
         if username == username_db and password == password_db:
+            client.disconnect()
             return d
     print('Could not find account')
     client.disconnect()
 
 
-def send_text(lat,lng):
+def send_text(lat,lng,target_number):
     # Your Account SID from twilio.com/console
     account_sid = "AC08edac3cdeeed8e8341e114d675949f6"
     # Your Auth Token from twilio.com/console
@@ -67,11 +73,10 @@ def send_text(lat,lng):
     client = Client(account_sid, auth_token)
 
     message = client.messages.create(
-        to="+18455210416", 
+        to="+1"+target_number, 
         from_="+19387770709",
         body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
-
 
 def printResults(data):
     # json module loads the string data into a dictionary
