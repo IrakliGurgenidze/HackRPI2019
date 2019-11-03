@@ -1,5 +1,9 @@
 import urllib.request
+import requests
 import json
+import uncurl
+import time
+from math import sin, cos, sqrt, atan2, radians
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
@@ -16,7 +20,8 @@ def create_document(username,password):
         'password': password,
         'preferences': {
             'data_permission': 'false',
-            'family_numbers':[] #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
+            'family_numbers':[], #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
+            'radius':20
         },
         'coordinates': [
             #[{"lat": 69},{"lng": 69},{"timestamp":"11/3/2019"}]
@@ -33,13 +38,14 @@ def add_coordinates(username,password,lat,lng):
 
     data = check_login(username,password)
 
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
     data['coordinates'].append([
                 {"lat": lat},
                 {"lng": lng},
-                {"timestamp":"11/4/2019"}
+                {"timestamp":current_time}
     ])
-
-    my_database.create_document(data)
+    my_database.save()
     print('Date pushed to database')
     client.disconnect()
 
@@ -53,12 +59,13 @@ def check_login(username, password):
         username_db = d["username"]
         password_db = d["password"]
         if username == username_db and password == password_db:
+            client.disconnect()
             return d
     print('Could not find account')
     client.disconnect()
 
 
-def send_text(lat,lng):
+def send_text(lat,lng,target_number):
     # Your Account SID from twilio.com/console
     account_sid = "AC08edac3cdeeed8e8341e114d675949f6"
     # Your Auth Token from twilio.com/console
@@ -67,11 +74,24 @@ def send_text(lat,lng):
     client = Client(account_sid, auth_token)
 
     message = client.messages.create(
-        to="+18455210416", 
+        to="+1"+target_number, 
         from_="+19387770709",
         body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
 
+def in_radius(d_lat,d_lng,lat,lng,radius):
+    R = 6373 #km
+    dlat = radians(lat) - radians(d_lat) 
+    dlon = radians(lng) - radians(d_lng)
+
+    a = sin(dlat / 2)**2 + cos(d_lat) * cos(lat) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+
+    if distance <= radius:
+        return True
+    return False
 
 def printResults(data):
     # json module loads the string data into a dictionary
