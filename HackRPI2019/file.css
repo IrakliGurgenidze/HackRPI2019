@@ -1,7 +1,7 @@
 h1{
 	color:black;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size:40px;
+	font-size:200%;
 	font-weight: bold;
 	margin: auto;
 	text-align: center;
@@ -16,6 +16,11 @@ p1{
 	text-align: center;
 
 
+}
+
+.generic{
+	font-size: 200%;
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 .container{
@@ -84,6 +89,15 @@ p{
     bottom: 0;
     right: 10px;
     max-width: 65px;
+}
+
+.register
+{
+	display: block;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 200px;
+    max-height: 100px
 }
 
 .return
