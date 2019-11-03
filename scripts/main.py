@@ -45,7 +45,7 @@ def add_coordinates(username,password,lat,lng):
                 {"lng": lng},
                 {"timestamp":current_time}
     ])
-
+    my_database.save()
     print('Date pushed to database')
     client.disconnect()
 
