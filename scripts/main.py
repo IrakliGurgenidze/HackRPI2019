@@ -4,6 +4,7 @@ import json
 import uncurl
 import time
 import datetime
+import math
 from math import sin, cos, sqrt, atan2, radians
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
@@ -79,11 +80,12 @@ def send_text(lat,lng,target_number):
 
     client = Client(account_sid, auth_token)
 
+
     message = client.messages.create(
         to="+1"+target_number, 
         from_="+19387770709",
         body="ATTENTION: You have been designated as a loved one or family member by\n" + 
-        "INSERT NAME HERE. A catagory 4.5+ has occured and power services may sparse\n."+ 
+        "INSERT NAME HERE. An earthquake has occured and power services may be sparse.\n"+ 
         "Here is INSERT NAME HERE's last location: " + ' www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
 
@@ -101,19 +103,19 @@ def in_radius(d_lat,d_lng,lat,lng,radius):
         return True
     return False
 
-def printResults(data):
+def print_results(data):
     # json module loads the string data into a dictionary
     quakes = json.loads(data)
-
+    quake_list = []
     # access the contents of the JSON like any other Python object
     if "title" in quakes["metadata"]:
         print(quakes["metadata"]["title"])
 
     for q in quakes["features"]:
-        if q["properties"]["mag"] >= 4.5:
-            print(q['geometry']['coordinates'], "and mag is:", q["properties"]["mag"])
+        if q["properties"]["mag"] >= 6.0:
+            print('Earthquake located at', q['geometry']['coordinates'], q["properties"]["place"] ,"--- Magnitude:", q["properties"]["mag"])
 
-def main():
+def get_earthquake_data():
     # variable to hold the source URL
     # free data feed from the USGS lists all earthquakes for the last day larger than Mag 2.5
     urlData = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson"
@@ -124,9 +126,13 @@ def main():
     if (webUrl.getcode() == 200):
         data = webUrl.read()
         # print out results
-        printResults(data)
+        print_results(data)
     else:
         print ("Received an error from server, cannot retrieve results " + str(webUrl.getcode()))
 
 if __name__ == "__main__":
-    send_text(10,20,'8455210416')
+    send_text(10,20,'9173594555')
+    #send_text(10,20,'8455210416')
+    send_text(41,10,'2396890887')
+    #send_text(41,10,'6507395096')
+    get_earthquake_data()
