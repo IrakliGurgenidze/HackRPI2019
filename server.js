@@ -82,7 +82,8 @@ app.post('/register', (req, res) => {
   res.redirect('/');
 });
 
-const server = app.listen(8080, '10.150.0.2', () => {
+const server = app.listen(8080, () => {
+// const server = app.listen(8080, '10.150.0.2', () => {
   console.log("listening");
 });
 
