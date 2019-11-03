@@ -16,7 +16,7 @@ def create_document(username,password):
     database_name = "test"
     my_database = client[database_name]
 
-    data = {
+    document = {
         'username': username,
         'password': password,
         'preferences': {
@@ -25,11 +25,10 @@ def create_document(username,password):
             'radius':20
         },
         'coordinates': [
-            []
         ]
     }
 
-    my_database.create_document(data)
+    my_database.create_document(document)
     print('Document created!')
     client.disconnect()
 
@@ -39,34 +38,18 @@ def add_coordinates(username,password,lat,lng):
     database_name = "test"
     my_database = client[database_name]
 
-    for data in my_database:
-        username_db = data["username"]
-        password_db = data["password"]
+    for document in my_database:
+        username_db = document["username"]
+        password_db = document["password"]
         if  username == username_db and password == password_db:
-            data['coordinates'].append([{"lat": lat},{"lng": lng},{"timestamp":str(datetime.datetime.now())}])
-            data.save()
+            document['coordinates'].append([{"lat": lat},{"lng": lng},{"timestamp":str(datetime.datetime.now())}])
+            document.save()
             print('Date pushed to database')
             break
         else:
             print("User not found")
 
     client.disconnect()
-
-def check_login(username, password):
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
-    client.connect()
-    database_name = "test"
-    my_database = client[database_name]
-
-    for d in my_database:
-        username_db = d["username"]
-        password_db = d["password"]
-        if username == username_db and password == password_db:
-            client.disconnect()
-            return d
-    print('Could not find account')
-    client.disconnect()
-
 
 def send_text(lat,lng,target_number):
     # Your Account SID from twilio.com/console
@@ -128,5 +111,5 @@ if __name__ == "__main__":
     #db_get()
     #send_text()
     #print(check_login("test2","testing2"))
-    #create_document('yeet','skrt')
+    create_document('yeet','skrt')
     add_coordinates('yeet','skrt',10,20)
