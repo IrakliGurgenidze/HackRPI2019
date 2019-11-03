@@ -10,7 +10,7 @@ from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 from twilio.rest import Client
 
-def create_document(username,password):
+def create_document(username,password, first_name, last_name):
     client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
     client.connect()
     database_name = "test"
@@ -19,13 +19,14 @@ def create_document(username,password):
     document = {
         'username': username,
         'password': password,
+        'first_name':first_name,
+        'last_name': last_name,
         'preferences': {
             'data_permission': 'false',
             'family_numbers':[], #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
             'radius':20
         },
-        'coordinates': [
-        ]
+        'coordinates': []
     }
 
     my_database.create_document(document)
@@ -44,7 +45,26 @@ def add_coordinates(username,password,lat,lng):
         if  username == username_db and password == password_db:
             document['coordinates'].append([{"lat": lat},{"lng": lng},{"timestamp":str(datetime.datetime.now())}])
             document.save()
-            print('Date pushed to database')
+            print('Coordinates pushed to document in database')
+            break
+        else:
+            print("User not found")
+
+    client.disconnect()
+
+def add_family_members(username,password,name,number):
+    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
+    client.connect()
+    database_name = "test"
+    my_database = client[database_name]
+
+    for document in my_database:
+        username_db = document["username"]
+        password_db = document["password"]
+        if  username == username_db and password == password_db:
+            document['preferences']['family_numbers'].append({number:name})
+            document.save()
+            print("Family member's phone number info pushed to document in database")
             break
         else:
             print("User not found")
@@ -62,7 +82,9 @@ def send_text(lat,lng,target_number):
     message = client.messages.create(
         to="+1"+target_number, 
         from_="+19387770709",
-        body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
+        body="ATTENTION: You have been designated as a loved one or family member by\n" + 
+        "INSERT NAME HERE. A catagory 4.5+ has occured and power services may sparse\n."+ 
+        "Here is INSERT NAME HERE's last location: " + ' www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
 
 def in_radius(d_lat,d_lng,lat,lng,radius):
@@ -107,9 +129,4 @@ def main():
         print ("Received an error from server, cannot retrieve results " + str(webUrl.getcode()))
 
 if __name__ == "__main__":
-    #main()
-    #db_get()
-    #send_text()
-    #print(check_login("test2","testing2"))
-    create_document('yeet','skrt')
-    add_coordinates('yeet','skrt',10,20)
+    send_text(10,20,'8455210416')
