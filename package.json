@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "pm2 start index --watch --ignore-watch \"node_modules\""
   },
   "repository": {
     "type": "git",
