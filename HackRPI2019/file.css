@@ -31,16 +31,41 @@ p{
 	text-align: center;
 }
 
+.box-1{
+	background-color:white;
+	color:black;
+
+	padding-top:20px;
+	padding-bottom:20px;
+	padding-right:20px;
+	padding-left:20px;
+
+	/* Same as above */
+	padding:20px;
+
+	margin-top:20px;
+	margin:20px 0;
+}
+
 .box-2{
 	background-color: #grey;
 	border: 10px;
 }
 
-.center {
+.center_upper {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 40%;
+    margin-top: 40px;
+    width: 20%;
+}
+
+.center_lower {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    width: 20%;
 }
 
 .portrait { 
@@ -64,7 +89,6 @@ p{
 
 .cog
 {
-    position: absolute;
     bottom: 0;
     right: 10px;
     max-width: 65px;
