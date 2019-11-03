@@ -15,6 +15,8 @@ def check_login(username, password):
         password_db = d["password"]
         if username == username_db and password == password_db:
             print(json.dumps(d))
+            client.disconnect()
+            return
     print('Could not find account', file=sys.stderr)
     client.disconnect()
 

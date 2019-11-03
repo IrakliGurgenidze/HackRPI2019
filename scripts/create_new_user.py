@@ -21,6 +21,7 @@ def create_new_user(username, password):
   
   doc = db.create_document(data)
 
+  print("user created")
   client.disconnect()
 
 if __name__=="__main__":
