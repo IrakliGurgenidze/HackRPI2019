@@ -12,7 +12,11 @@ def create_new_user(username, password):
   data = {
     "username": username,
     "password": password,
-    "uuid": uuid.uuid4().hex
+    'preferences': {
+        'data_permission': 'false',
+        'family_numbers':[]
+    },
+    'coordinates': []
   }
   
   doc = db.create_document(data)
