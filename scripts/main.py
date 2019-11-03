@@ -3,6 +3,7 @@ import requests
 import json
 import uncurl
 import time
+import datetime
 from math import sin, cos, sqrt, atan2, radians
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
@@ -24,10 +25,12 @@ def create_document(username,password):
             'radius':20
         },
         'coordinates': [
-            #[{"lat": 69},{"lng": 69},{"timestamp":"11/3/2019"}]
+            []
         ]
     }
 
+    my_database.create_document(data)
+    print('Document created!')
     client.disconnect()
 
 def add_coordinates(username,password,lat,lng):
@@ -36,17 +39,17 @@ def add_coordinates(username,password,lat,lng):
     database_name = "test"
     my_database = client[database_name]
 
-    data = check_login(username,password)
+    for data in my_database:
+        username_db = data["username"]
+        password_db = data["password"]
+        if  username == username_db and password == password_db:
+            data['coordinates'].append([{"lat": lat},{"lng": lng},{"timestamp":str(datetime.datetime.now())}])
+            data.save()
+            print('Date pushed to database')
+            break
+        else:
+            print("User not found")
 
-    t = time.localtime()
-    current_time = time.strftime("%H:%M:%S", t)
-    data['coordinates'].append([
-                {"lat": lat},
-                {"lng": lng},
-                {"timestamp":current_time}
-    ])
-    my_database.save()
-    print('Date pushed to database')
     client.disconnect()
 
 def check_login(username, password):
@@ -121,7 +124,9 @@ def main():
         print ("Received an error from server, cannot retrieve results " + str(webUrl.getcode()))
 
 if __name__ == "__main__":
-    main()
+    #main()
     #db_get()
     #send_text()
-    #check_login("skrt@gmail.com","julia1738")
+    #print(check_login("test2","testing2"))
+    #create_document('yeet','skrt')
+    add_coordinates('yeet','skrt',10,20)
