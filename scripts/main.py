@@ -3,6 +3,7 @@ import requests
 import json
 import uncurl
 import time
+from math import sin, cos, sqrt, atan2, radians
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
@@ -19,7 +20,8 @@ def create_document(username,password):
         'password': password,
         'preferences': {
             'data_permission': 'false',
-            'family_numbers':[] #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
+            'family_numbers':[], #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
+            'radius':20
         },
         'coordinates': [
             #[{"lat": 69},{"lng": 69},{"timestamp":"11/3/2019"}]
@@ -44,7 +46,6 @@ def add_coordinates(username,password,lat,lng):
                 {"timestamp":current_time}
     ])
 
-    my_database.create_document(data)
     print('Date pushed to database')
     client.disconnect()
 
@@ -77,6 +78,20 @@ def send_text(lat,lng,target_number):
         from_="+19387770709",
         body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
+
+def in_radius(d_lat,d_lng,lat,lng,radius):
+    R = 6373 #km
+    dlat = radians(lat) - radians(d_lat) 
+    dlon = radians(lng) - radians(d_lng)
+
+    a = sin(dlat / 2)**2 + cos(d_lat) * cos(lat) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+
+    if distance <= radius:
+        return True
+    return False
 
 def printResults(data):
     # json module loads the string data into a dictionary
