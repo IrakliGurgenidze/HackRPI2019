@@ -6,8 +6,12 @@ function updateBack(data) {
   xhr.open("POST", "/locationUpdate", true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.onreadystatechange = function () {
-    if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
-      console.log("ok");
+    if (this.readyState === 4) {
+      console.log(this.response);
+      console.log(this.status);
+      if (this.status === 401) {
+        window.location.replace("/login.html");
+      }
     } 
   }
   xhr.send(JSON.stringify(data));   
@@ -28,3 +32,10 @@ function goog_loc() {
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send();
 }
+
+function daemon() {
+  goog_loc();
+  setTimeout(daemon, 5000);
+}
+
+daemon()

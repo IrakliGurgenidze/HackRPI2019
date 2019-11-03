@@ -17,7 +17,7 @@ def save_last_location(username, password, locationData):
         username_db = d["username"]
         password_db = d["password"]
         if username == username_db and password == password_db:
-            d['coordinates'].append(locationData)
+            d['coordinates'].append(json.loads(locationData))
             d.save()
             found = True
             break

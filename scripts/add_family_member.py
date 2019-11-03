@@ -11,19 +11,22 @@ def add_family_members(username, password, fullName, phoneNumber):
     client.connect()
     database_name = "test"
     my_database = client[database_name]
-
+    
+    found = False
     for document in my_database:
         username_db = document["username"]
         password_db = document["password"]
-        if  username == username_db and password == password_db:
-            document['preferences']['family_numbers'].append({fullName, phoneNumber})
+        if username == username_db and password == password_db:
+            document['preferences']['family_numbers'].append({"fullName":fullName, "phoneNumber": phoneNumber})
             document.save()
             print("Family member's phone number info pushed to document in database")
+            found = True
             break
-        else:
-            print("User not found", file=sys.stderr)
+        
+    if not found: 
+        print(f"User({username}:{password}) not found", file=sys.stderr)
 
     client.disconnect()
 
 if __name__ == '__main__':
-    add_family_members(username, password, name, number)
+    add_family_members(*sys.argv[1:5])

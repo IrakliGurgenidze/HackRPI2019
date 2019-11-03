@@ -10,7 +10,7 @@ function promisePythonSpawn(args) {
       res(data);
     });
     cp.stderr.on('data', (data) => {
-      console.log('err ' + JSON.stringify(args) + ' - ' + JSON.stringify(data));
+      console.log('err ' + JSON.stringify(args) + ' - ' + JSON.stringify(data.toString()));
       rej(data);
     });
     /*
@@ -32,7 +32,10 @@ function check_login(username, password) {
 function create_user(username, password) {
   promisePythonSpawn(['scripts/create_new_user.py', username, password]);
 }
-  
+
+function add_family_member(username, password, fullName, phoneNumber, cb) {
+  promisePythonSpawn(['scripts/add_family_member.py', username, password, fullName, phoneNumber]).then((success) => { cb(success.toString()); }).catch((err) => { cb(err.toString()); });
+}  
 
 const express = require('express');
 
@@ -59,42 +62,44 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (userpass, done) {
   // find
   console.log("des " + JSON.stringify(userpass));
-  promisePythonSpawn(['scripts/check_login.py', userpass.username, userpass.password]).then((user) => { done(null, user); }).catch((err) => { done(err, null); });
+  promisePythonSpawn(['scripts/check_login.py', userpass.username, userpass.password]).then((user) => { done(null, JSON.parse(user.toString())); }).catch((err) => { done(err, null); });
   
 });
 
 
 var app = express();
 
-//app.use(express.static('public'));
+app.use(express.static('HackRPI2019'));
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 
-app.use(session({ secret: 'mxsoidjk' }));
+app.use(session({ secret: 'mxsoidjk', resave: false, saveUninitialized: false }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.use(/\/((?!(login|register)).)*/, (req, res, next) => {
+//app.use(/\/((?!(login|register)).)*/, (req, res, next) => {
+const authMid = (req, res, next) => {
   console.log('auth');
   console.dir(req.user);
   if (!req.user) {
-    res.redirect('/login.html');
+    //res.redirect('/login.html');
+    res.status(401).end();
   } else {
     next();
   }
-});
+};
 
 
-app.use(express.static('HackRPI2019'));
-
-
-app.post('/locationUpdate', (req, res) => {
+app.post('/locationUpdate', authMid, (req, res) => {
   const data = JSON.stringify(req.body.location);
-  const user = "test";
-  console.log("got loc " + user + " " + data);
+  const username = req.user.username;
+  const password = req.user.password;
+  console.log("got loc " + username + " " + data);
+  promisePythonSpawn(['scripts/save_last_location.py', username, password, data]).then((success) => { res.send(success); }).catch((fail) => { res.send(fail); });
   //const sltd = spawn('python3', ["scripts/save_loc_to_db.py", user, data]);
   /*sltd.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
@@ -106,7 +111,7 @@ app.post('/locationUpdate', (req, res) => {
     console.log(`close: ${code}`);
   });*/
 
-  res.send("gotcha");
+//  res.send("gotcha");
 });
 
 app.post('/login',
@@ -128,7 +133,17 @@ app.post('/register', (req, res) => {
   res.redirect('/');
 });
 
+app.post('/addFamily', authMid, (req, res) => {
+  const username = req.user.username;
+  const password = req.user.password;
+  const fullName = req.body.firstName + " " + req.body.lastName;
+  const phoneNumber = req.body.phoneNumber;
+  console.log(`addfam ${username} ${password} ${fullName} ${phoneNumber}`);
+  
+  add_family_member(username, password, fullName, phoneNumber, (result) => { res.send(result); });
 
+  //res.send(result);
+});
 
 const server = app.listen(8080, () => {
 // const server = app.listen(8080, '10.150.0.2', () => {
