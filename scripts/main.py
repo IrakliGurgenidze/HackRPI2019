@@ -3,31 +3,34 @@ import requests
 import json
 import uncurl
 import time
+import datetime
 from math import sin, cos, sqrt, atan2, radians
 from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 from twilio.rest import Client
 
-def create_document(username,password):
+def create_document(username,password, first_name, last_name):
     client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
 
-    data = {
+    document = {
         'username': username,
         'password': password,
+        'first_name':first_name,
+        'last_name': last_name,
         'preferences': {
             'data_permission': 'false',
             'family_numbers':[], #[{'8455210416':'Bob'},{'8455210415':'Sally'}]
             'radius':20
         },
-        'coordinates': [
-            #[{"lat": 69},{"lng": 69},{"timestamp":"11/3/2019"}]
-        ]
+        'coordinates': []
     }
 
+    my_database.create_document(document)
+    print('Document created!')
     client.disconnect()
 
 def add_coordinates(username,password,lat,lng):
@@ -36,34 +39,37 @@ def add_coordinates(username,password,lat,lng):
     database_name = "test"
     my_database = client[database_name]
 
-    data = check_login(username,password)
+    for document in my_database:
+        username_db = document["username"]
+        password_db = document["password"]
+        if  username == username_db and password == password_db:
+            document['coordinates'].append([{"lat": lat},{"lng": lng},{"timestamp":str(datetime.datetime.now())}])
+            document.save()
+            print('Coordinates pushed to document in database')
+            break
+        else:
+            print("User not found")
 
-    t = time.localtime()
-    current_time = time.strftime("%H:%M:%S", t)
-    data['coordinates'].append([
-                {"lat": lat},
-                {"lng": lng},
-                {"timestamp":current_time}
-    ])
-    my_database.save()
-    print('Date pushed to database')
     client.disconnect()
 
-def check_login(username, password):
+def add_family_members(username,password,name,number):
     client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
 
-    for d in my_database:
-        username_db = d["username"]
-        password_db = d["password"]
-        if username == username_db and password == password_db:
-            client.disconnect()
-            return d
-    print('Could not find account')
-    client.disconnect()
+    for document in my_database:
+        username_db = document["username"]
+        password_db = document["password"]
+        if  username == username_db and password == password_db:
+            document['preferences']['family_numbers'].append({number:name})
+            document.save()
+            print("Family member's phone number info pushed to document in database")
+            break
+        else:
+            print("User not found")
 
+    client.disconnect()
 
 def send_text(lat,lng,target_number):
     # Your Account SID from twilio.com/console
@@ -76,7 +82,9 @@ def send_text(lat,lng,target_number):
     message = client.messages.create(
         to="+1"+target_number, 
         from_="+19387770709",
-        body='www.google.com/maps/place/'+str(lat)+'+'+str(lng))
+        body="ATTENTION: You have been designated as a loved one or family member by\n" + 
+        "INSERT NAME HERE. A catagory 4.5+ has occured and power services may sparse\n."+ 
+        "Here is INSERT NAME HERE's last location: " + ' www.google.com/maps/place/'+str(lat)+'+'+str(lng))
     print(message.sid)
 
 def in_radius(d_lat,d_lng,lat,lng,radius):
@@ -121,7 +129,4 @@ def main():
         print ("Received an error from server, cannot retrieve results " + str(webUrl.getcode()))
 
 if __name__ == "__main__":
-    main()
-    #db_get()
-    #send_text()
-    #check_login("skrt@gmail.com","julia1738")
+    send_text(10,20,'8455210416')
