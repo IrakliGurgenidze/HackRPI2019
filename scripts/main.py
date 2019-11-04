@@ -12,7 +12,7 @@ from cloudant.result import Result, ResultByKey
 from twilio.rest import Client
 
 def create_document(username,password, first_name, last_name):
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
+    client = Cloudant.iam("","")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
@@ -35,7 +35,7 @@ def create_document(username,password, first_name, last_name):
     client.disconnect()
 
 def add_coordinates(username,password,lat,lng):
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
+    client = Cloudant.iam("","")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
@@ -54,7 +54,7 @@ def add_coordinates(username,password,lat,lng):
     client.disconnect()
 
 def add_family_members(username,password,name,number):
-    client = Cloudant.iam("4936a8b9-e57c-4de5-b14b-847be444e187-bluemix", "dVyyF4i1Cs2NvTwmzlJiGHnyGlVcHm_c16LzIcOrZIH0")
+    client = Cloudant.iam("","")
     client.connect()
     database_name = "test"
     my_database = client[database_name]
@@ -74,9 +74,9 @@ def add_family_members(username,password,name,number):
 
 def send_text(lat,lng,target_number):
     # Your Account SID from twilio.com/console
-    account_sid = "AC08edac3cdeeed8e8341e114d675949f6"
+    account_sid = ""
     # Your Auth Token from twilio.com/console
-    auth_token  = "78fa5f050df281597e411df17c6f0896"
+    auth_token  = ""
 
     client = Client(account_sid, auth_token)
 
@@ -132,7 +132,7 @@ def get_earthquake_data():
 
 if __name__ == "__main__":
     send_text(10,20,'9173594555')
-    #send_text(10,20,'8455210416')
+    send_text(10,20,'8455210416')
     send_text(41,10,'2396890887')
     #send_text(41,10,'6507395096')
-    get_earthquake_data()
+    #get_earthquake_data()
